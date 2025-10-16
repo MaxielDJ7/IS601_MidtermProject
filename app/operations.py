@@ -286,6 +286,27 @@ class Percent(Operation):
         self.validate_operands(a, b)
         return (a / b) * 100
 
+class Absolute(Operation):
+    """
+    Absolute difference operation implementation.
+
+    Performs the subtraction of one number from another and returns the aboslute difference.
+    """
+
+    def execute(self, a: Decimal, b: Decimal) -> Decimal:
+        """
+        Subtract one number from another and return the aboslute difference.
+
+        Args:
+            a (Decimal): First operand.
+            b (Decimal): Second operand.
+
+        Returns:
+            Decimal: Aboslute difference between the two operands.
+        """
+        self.validate_operands(a, b)
+        return abs(a - b)
+
 class OperationFactory:
     """
     Factory class for creating operation instances.

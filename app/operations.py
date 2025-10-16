@@ -5,7 +5,7 @@
 from abc import ABC, abstractmethod
 from decimal import Decimal
 from typing import Dict
-
+from app.exceptions import ValidationError
 
 
 class Operation(ABC):
@@ -35,7 +35,34 @@ class Operation(ABC):
         """
         pass  # pragma: no cover
 
-    
+    def validate_operands(self, a: Decimal, b: Decimal) -> None:
+        """
+        Validate operands before execution.
+
+        Can be overridden by subclasses to enforce specific validation rules
+        for different operations.
+
+        Args:
+            a (Decimal): First operand.
+            b (Decimal): Second operand.
+
+        Raises:
+            ValidationError: If operands are invalid.
+        """
+        pass
+
+    def __str__(self) -> str:
+        """
+        Return operation name for display.
+
+        Provides a string representation of the operation, typically the class name.
+
+        Returns:
+            str: Name of the operation.
+        """
+        return self.__class__.__name__
+
+
 class Addition(Operation):
     """
     Addition operation implementation.
@@ -54,7 +81,7 @@ class Addition(Operation):
         Returns:
             Decimal: Sum of the two operands.
         """
-        
+        self.validate_operands(a, b)
         return a + b
 
 
@@ -76,7 +103,7 @@ class Subtraction(Operation):
         Returns:
             Decimal: Difference between the two operands.
         """
-        
+        self.validate_operands(a, b)
         return a - b
 
 
@@ -98,7 +125,7 @@ class Multiplication(Operation):
         Returns:
             Decimal: Product of the two operands.
         """
-        
+        self.validate_operands(a, b)
         return a * b
 
 
@@ -122,7 +149,9 @@ class Division(Operation):
         Raises:
             ValidationError: If the divisor is zero.
         """
-       
+        super().validate_operands(a, b)
+        if b == 0:
+            raise ValidationError("Division by zero is not allowed")
 
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """
@@ -135,7 +164,7 @@ class Division(Operation):
         Returns:
             Decimal: Quotient of the division.
         """
-       
+        self.validate_operands(a, b)
         return a / b
 
 
@@ -146,7 +175,22 @@ class Power(Operation):
     Raises one number to the power of another.
     """
 
-   
+    def validate_operands(self, a: Decimal, b: Decimal) -> None:
+        """
+        Validate operands for power operation.
+
+        Overrides the base class method to ensure that the exponent is not negative.
+
+        Args:
+            a (Decimal): Base number.
+            b (Decimal): Exponent.
+
+        Raises:
+            ValidationError: If the exponent is negative.
+        """
+        super().validate_operands(a, b)
+        if b < 0:
+            raise ValidationError("Negative exponents not supported")
 
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """
@@ -159,7 +203,7 @@ class Power(Operation):
         Returns:
             Decimal: Result of the exponentiation.
         """
-       
+        self.validate_operands(a, b)
         return Decimal(pow(float(a), float(b)))
 
 
@@ -170,7 +214,25 @@ class Root(Operation):
     Calculates the nth root of a number.
     """
 
-    
+    def validate_operands(self, a: Decimal, b: Decimal) -> None:
+        """
+        Validate operands for root operation.
+
+        Overrides the base class method to ensure that the number is non-negative
+        and the root degree is not zero.
+
+        Args:
+            a (Decimal): Number from which the root is taken.
+            b (Decimal): Degree of the root.
+
+        Raises:
+            ValidationError: If the number is negative or the root degree is zero.
+        """
+        super().validate_operands(a, b)
+        if a < 0:
+            raise ValidationError("Cannot calculate root of negative number")
+        if b == 0:
+            raise ValidationError("Zero root is undefined")
 
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         """
@@ -183,7 +245,7 @@ class Root(Operation):
         Returns:
             Decimal: Result of the root calculation.
         """
-        
+        self.validate_operands(a, b)
         return Decimal(pow(float(a), 1 / float(b)))
 
 

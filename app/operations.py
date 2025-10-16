@@ -323,7 +323,9 @@ class OperationFactory:
         'multiply': Multiplication,
         'divide': Division,
         'power': Power,
-        'root': Root
+        'root': Root,
+        'percent': Percent,
+        'absolute': Absolute
     }
 
     @classmethod

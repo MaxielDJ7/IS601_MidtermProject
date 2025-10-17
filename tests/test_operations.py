@@ -11,6 +11,8 @@ from app.operations import (
     Division,
     Power,
     Root,
+    Percent,
+    AbsoluteDiff,
     OperationFactory,
 )
 
@@ -181,6 +183,44 @@ class TestRoot(BaseOperationTest):
         },
     }
 
+class TestPercent(BaseOperationTest):
+    """Test Percent operation."""
+
+    operation_class = Percent
+    valid_test_cases = {
+        "positive_numbers": {"a": "2", "b": "4", "expected": "50"},
+        "negative_numbers": {"a": "-2", "b": "-4", "expected": "50"},
+        "mixed_signs": {"a": "-2", "b": "4", "expected": "-50"},
+        "decimals": {"a": "25.4", "b": "50", "expected": "50.8"},
+        "divide_zero": {"a": "0", "b": "5", "expected": "0"},
+    }
+    invalid_test_cases = {
+        "divide_by_zero": {
+            "a": "5",
+            "b": "0",
+            "error": ValidationError,
+            "message": "Division by zero is not allowed"
+        },
+    }
+
+class TestAbsoluteDiff(BaseOperationTest):
+    """Test Abosolute Difference operation."""
+
+    operation_class = AbsoluteDiff
+    valid_test_cases = {
+        "positive_numbers": {"a": "5", "b": "3", "expected": "2"},
+        "negative_numbers": {"a": "-5", "b": "-3", "expected": "2"},
+        "mixed_signs": {"a": "-5", "b": "3", "expected": "8"},
+        "zero_result": {"a": "5", "b": "5", "expected": "0"},
+        "decimals": {"a": "5.5", "b": "3.3", "expected": "2.2"},
+        "large_numbers": {
+            "a": "1e10",
+            "b": "1e9",
+            "expected": "9000000000"
+        },
+    }
+    invalid_test_cases = {}  # Absolute Difference has no invalid cases
+
 
 class TestOperationFactory:
     """Test OperationFactory functionality."""
@@ -194,6 +234,8 @@ class TestOperationFactory:
             'divide': Division,
             'power': Power,
             'root': Root,
+            'percent': Percent,
+            'abosolute': AbsoluteDiff
         }
 
         for op_name, op_class in operation_map.items():

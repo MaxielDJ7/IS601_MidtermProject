@@ -235,7 +235,7 @@ class TestOperationFactory:
             'power': Power,
             'root': Root,
             'percent': Percent,
-            'abosolute': AbsoluteDiff
+            'absolutediff': AbsoluteDiff
         }
 
         for op_name, op_class in operation_map.items():

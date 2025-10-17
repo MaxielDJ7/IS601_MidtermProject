@@ -325,7 +325,7 @@ class OperationFactory:
         'power': Power,
         'root': Root,
         'percent': Percent,
-        'absolute': AbsoluteDiff
+        'absolutediff': AbsoluteDiff
     }
 
     @classmethod

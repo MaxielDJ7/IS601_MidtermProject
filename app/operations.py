@@ -286,7 +286,7 @@ class Percent(Operation):
         self.validate_operands(a, b)
         return (a / b) * 100
 
-class Absolute(Operation):
+class AbsoluteDiff(Operation):
     """
     Absolute difference operation implementation.
 
@@ -325,7 +325,7 @@ class OperationFactory:
         'power': Power,
         'root': Root,
         'percent': Percent,
-        'absolute': Absolute
+        'absolute': AbsoluteDiff
     }
 
     @classmethod

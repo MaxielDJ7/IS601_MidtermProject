@@ -15,6 +15,9 @@ def test_subtraction():
     calc = Calculation(operation="Subtraction", operand1=Decimal("5"), operand2=Decimal("3"))
     assert calc.result == Decimal("2")
 
+def test_absolutediff():
+    calc = Calculation(operation="AbsoluteDiff", operand1=Decimal("-5"), operand2=Decimal("3"))
+    assert calc.result == Decimal("8")
 
 def test_multiplication():
     calc = Calculation(operation="Multiplication", operand1=Decimal("4"), operand2=Decimal("2"))
@@ -30,6 +33,9 @@ def test_division_by_zero():
     with pytest.raises(OperationError, match="Division by zero is not allowed"):
         Calculation(operation="Division", operand1=Decimal("8"), operand2=Decimal("0"))
 
+def test_percent():
+    calc = Calculation(operation="Percent", operand1=Decimal("2"), operand2=Decimal("8"))
+    assert calc.result == Decimal("25")
 
 def test_power():
     calc = Calculation(operation="Power", operand1=Decimal("2"), operand2=Decimal("3"))

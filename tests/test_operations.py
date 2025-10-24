@@ -15,7 +15,8 @@ from app.operations import (
     AbsoluteDiff,
     IntDivide,
     OperationFactory,
-    Modulus
+    Modulus, 
+    register_operation
 )
 
 
@@ -268,7 +269,10 @@ class TestOperationFactory:
 
     def test_create_valid_operations(self):
         """Test creation of all valid operations."""
-        operation_map = {
+
+        # no longer need to hard code operations
+        operation_map = OperationFactory.available_operations()
+        expected_operations = {
             'add': Addition,
             'subtract': Subtraction,
             'multiply': Multiplication,
@@ -277,10 +281,11 @@ class TestOperationFactory:
             'root': Root,
             'percent': Percent,
             'absolutediff': AbsoluteDiff,
-            'intdivide' : IntDivide
+            'intdivide' : IntDivide,
+            'modulo' : Modulus
         }
 
-        for op_name, op_class in operation_map.items():
+        for op_name, op_class in expected_operations.items():
             operation = OperationFactory.create_operation(op_name)
             assert isinstance(operation, op_class)
             # Test case-insensitive
@@ -309,3 +314,18 @@ class TestOperationFactory:
 
         with pytest.raises(TypeError, match="Operation class must inherit"):
             OperationFactory.register_operation("invalid", InvalidOperation)
+    
+    def test_register_operation_decorator(self):
+        """Test that decorator is auto registering a new operation."""
+        @register_operation("test_auto_register")
+        class TestAutoReg(Operation):
+            def execute(self, a: Decimal, b: Decimal) -> Decimal:
+                return a + b
+        
+        operations = OperationFactory.available_operations()
+        assert "test_auto_register" in operations
+        assert issubclass(operations["test_auto_register"], Operation)
+        
+        op_instance = OperationFactory.create_operation("test_auto_register")
+        result = op_instance.execute(Decimal("2"), Decimal("3"))
+        assert result == Decimal("5")

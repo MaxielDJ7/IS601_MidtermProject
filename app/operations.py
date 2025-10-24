@@ -9,21 +9,6 @@ from app.exceptions import ValidationError
 
 # standalone decorator method to register an operation 
 
-def register_operation(name: str):
-    """
-    Decorator that automatically registers an Operation subclass
-    with the OperationFactory when the class is defined.
-
-    Args:
-        name (str): The operation name (used as command and menu label).
-    """
-    def decorator(cls):
-        OperationFactory.register_operation(name, cls)
-        cls.operation_name = name
-        return cls
-    return decorator
-
-
 class Operation(ABC):
     """
     Abstract base class for calculator operations.
@@ -78,6 +63,82 @@ class Operation(ABC):
         """
         return self.__class__.__name__
 
+class OperationFactory:
+    """
+    Factory class for creating operation instances.
+
+    Implements the Factory pattern by providing a method to instantiate
+    different operation classes based on a given operation type. This promotes
+    scalability and decouples the creation logic from the Calculator class.
+    """
+
+    # will fill dictionary with operations via decorator
+    _operations: Dict[str, type] = {}
+
+    @classmethod
+    def register_operation(cls, name: str, operation_class: type) -> None:
+        """
+        Register a new operation type.
+
+        Allows dynamic addition of new operations to the factory.
+
+        Args:
+            name (str): Operation identifier (e.g., 'modulus').
+            operation_class (type): The class implementing the new operation.
+
+        Raises:
+            TypeError: If the operation_class does not inherit from Operation.
+        """
+        if not issubclass(operation_class, Operation):
+            raise TypeError("Operation class must inherit from Operation")
+        cls._operations[name.lower()] = operation_class
+
+    @classmethod
+    def create_operation(cls, operation_type: str) -> Operation:
+        """
+        Create an operation instance based on the operation type.
+
+        This method retrieves the appropriate operation class from the
+        _operations dictionary and instantiates it.
+
+        Args:
+            operation_type (str): The type of operation to create (e.g., 'add').
+
+        Returns:
+            Operation: An instance of the specified operation class.
+
+        Raises:
+            ValueError: If the operation type is unknown.
+        """
+        operation_class = cls._operations.get(operation_type.lower())
+        if not operation_class:
+            raise ValueError(f"Unknown operation: {operation_type}")
+        return operation_class()
+    
+    @classmethod
+    def available_operations(cls) -> Dict[str, type]:
+        """
+        Return all registered operations.
+
+        Returns:
+            Dict[str, type]: Mapping of operation names to their classes.
+        """
+        return dict(cls._operations)
+
+def register_operation(name: str):
+    """
+    Decorator that automatically registers an Operation subclass
+    with the OperationFactory when the class is defined.
+
+    Args:
+        name (str): The operation name (used as command and menu label).
+    """
+    def decorator(cls):
+        OperationFactory.register_operation(name, cls)
+        cls.operation_name = name
+        return cls
+    return decorator
+
 @register_operation("add")
 class Addition(Operation):
     """
@@ -100,7 +161,7 @@ class Addition(Operation):
         self.validate_operands(a, b)
         return a + b
 
-@register_operation("substract")
+@register_operation("subtract")
 class Subtraction(Operation):
     """
     Subtraction operation implementation.
@@ -402,66 +463,4 @@ class Modulus(Operation):
         """
         self.validate_operands(a, b)
         return a % b
-
-class OperationFactory:
-    """
-    Factory class for creating operation instances.
-
-    Implements the Factory pattern by providing a method to instantiate
-    different operation classes based on a given operation type. This promotes
-    scalability and decouples the creation logic from the Calculator class.
-    """
-
-    # will fill dictionary with operations via decorator
-    _operations: Dict[str, type] = {}
-
-    @classmethod
-    def register_operation(cls, name: str, operation_class: type) -> None:
-        """
-        Register a new operation type.
-
-        Allows dynamic addition of new operations to the factory.
-
-        Args:
-            name (str): Operation identifier (e.g., 'modulus').
-            operation_class (type): The class implementing the new operation.
-
-        Raises:
-            TypeError: If the operation_class does not inherit from Operation.
-        """
-        if not issubclass(operation_class, Operation):
-            raise TypeError("Operation class must inherit from Operation")
-        cls._operations[name.lower()] = operation_class
-
-    @classmethod
-    def create_operation(cls, operation_type: str) -> Operation:
-        """
-        Create an operation instance based on the operation type.
-
-        This method retrieves the appropriate operation class from the
-        _operations dictionary and instantiates it.
-
-        Args:
-            operation_type (str): The type of operation to create (e.g., 'add').
-
-        Returns:
-            Operation: An instance of the specified operation class.
-
-        Raises:
-            ValueError: If the operation type is unknown.
-        """
-        operation_class = cls._operations.get(operation_type.lower())
-        if not operation_class:
-            raise ValueError(f"Unknown operation: {operation_type}")
-        return operation_class()
-    
-    @classmethod
-    def available_operations(cls) -> Dict[str, type]:
-        """
-        Return all registered operations.
-
-        Returns:
-            Dict[str, type]: Mapping of operation names to their classes.
-        """
-        return dict(cls._operations)
 

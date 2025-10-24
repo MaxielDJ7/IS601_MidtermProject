@@ -13,6 +13,7 @@ from app.operations import (
     Root,
     Percent,
     AbsoluteDiff,
+    IntDivide,
     OperationFactory,
 )
 
@@ -221,6 +222,25 @@ class TestAbsoluteDiff(BaseOperationTest):
     }
     invalid_test_cases = {}  # Absolute Difference has no invalid cases
 
+class TestIntDivide(BaseOperationTest):
+    """Test Integer Division operation."""
+
+    operation_class = IntDivide
+    valid_test_cases = {
+        "positive_numbers": {"a": "7", "b": "2", "expected": "3"},
+        "negative_numbers": {"a": "-6", "b": "-5", "expected": "1"},
+        "mixed_signs": {"a": "-6", "b": "4", "expected": "-1"},
+        "decimals": {"a": "5.5", "b": "2", "expected": "2"},
+        "divide_zero": {"a": "0", "b": "5", "expected": "0"},
+    }
+    invalid_test_cases = {
+        "divide_by_zero": {
+            "a": "5",
+            "b": "0",
+            "error": ValidationError,
+            "message": "Division by zero is not allowed"
+        },
+    }
 
 class TestOperationFactory:
     """Test OperationFactory functionality."""
@@ -235,7 +255,8 @@ class TestOperationFactory:
             'power': Power,
             'root': Root,
             'percent': Percent,
-            'absolutediff': AbsoluteDiff
+            'absolutediff': AbsoluteDiff,
+            'intdivide' : IntDivide
         }
 
         for op_name, op_class in operation_map.items():

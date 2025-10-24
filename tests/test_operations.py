@@ -15,6 +15,7 @@ from app.operations import (
     AbsoluteDiff,
     IntDivide,
     OperationFactory,
+    Modulus
 )
 
 
@@ -231,6 +232,26 @@ class TestIntDivide(BaseOperationTest):
         "negative_numbers": {"a": "-6", "b": "-5", "expected": "1"},
         "mixed_signs": {"a": "-6", "b": "4", "expected": "-1"},
         "decimals": {"a": "5.5", "b": "2", "expected": "2"},
+        "divide_zero": {"a": "0", "b": "5", "expected": "0"},
+    }
+    invalid_test_cases = {
+        "divide_by_zero": {
+            "a": "5",
+            "b": "0",
+            "error": ValidationError,
+            "message": "Division by zero is not allowed"
+        },
+    }
+
+class TestModulus(BaseOperationTest):
+    """Test modulus operation."""
+
+    operation_class = Modulus
+    valid_test_cases = {
+        "positive_numbers": {"a": "7", "b": "2", "expected": "1"},
+        "negative_numbers": {"a": "-6", "b": "-5", "expected": "-1"},
+        "mixed_signs": {"a": "-6", "b": "4", "expected": "-2"},
+        "decimals": {"a": "5.5", "b": "2", "expected": "1.5"},
         "divide_zero": {"a": "0", "b": "5", "expected": "0"},
     }
     invalid_test_cases = {

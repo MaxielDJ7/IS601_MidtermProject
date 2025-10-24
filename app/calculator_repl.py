@@ -36,7 +36,12 @@ def calculator_repl():
                 if command == 'help':
                     # Display available commands
                     print("\nAvailable commands:")
-                    print("  add, subtract, multiply, divide, power, root, percent, absolutediff, intdivide, modulo - Perform calculations")
+                    # print("  add, subtract, multiply, divide, power, root, percent, absolutediff, intdivide, modulo - Perform calculations")
+                   
+                   # loop through the items registered via decorator
+                    for operation_name , operation_cls in sorted(OperationFactory.available_operations().items()):
+                        print(f" {operation_name} - Perform {operation_name} operation")
+
                     print("  history - Show calculation history")
                     print("  clear - Clear calculation history")
                     print("  undo - Undo the last calculation")
@@ -107,7 +112,8 @@ def calculator_repl():
                         print(f"Error loading history: {e}")
                     continue
 
-                if command in ['add', 'subtract', 'multiply', 'divide', 'power', 'root','percent','absolutediff','intdivide','modulo']:
+                #if command in ['add', 'subtract', 'multiply', 'divide', 'power', 'root','percent','absolutediff','intdivide','modulo']:
+                if command in OperationFactory.available_operations():
                     # Perform the specified arithmetic operation
                     try:
                         print("\nEnter numbers (or 'cancel' to abort):")

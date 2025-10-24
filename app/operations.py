@@ -7,6 +7,22 @@ from decimal import Decimal
 from typing import Dict
 from app.exceptions import ValidationError
 
+# standalone decorator method to register an operation 
+
+def register_operation(name: str):
+    """
+    Decorator that automatically registers an Operation subclass
+    with the OperationFactory when the class is defined.
+
+    Args:
+        name (str): The operation name (used as command and menu label).
+    """
+    def decorator(cls):
+        OperationFactory.register_operation(name, cls)
+        cls.operation_name = name
+        return cls
+    return decorator
+
 
 class Operation(ABC):
     """
@@ -62,7 +78,7 @@ class Operation(ABC):
         """
         return self.__class__.__name__
 
-
+@register_operation("add")
 class Addition(Operation):
     """
     Addition operation implementation.
@@ -84,7 +100,7 @@ class Addition(Operation):
         self.validate_operands(a, b)
         return a + b
 
-
+@register_operation("substract")
 class Subtraction(Operation):
     """
     Subtraction operation implementation.
@@ -106,7 +122,7 @@ class Subtraction(Operation):
         self.validate_operands(a, b)
         return a - b
 
-
+@register_operation("multiply")
 class Multiplication(Operation):
     """
     Multiplication operation implementation.
@@ -128,7 +144,7 @@ class Multiplication(Operation):
         self.validate_operands(a, b)
         return a * b
 
-
+@register_operation("divide")
 class Division(Operation):
     """
     Division operation implementation.
@@ -167,7 +183,7 @@ class Division(Operation):
         self.validate_operands(a, b)
         return a / b
 
-
+@register_operation("power")
 class Power(Operation):
     """
     Power (exponentiation) operation implementation.
@@ -206,7 +222,7 @@ class Power(Operation):
         self.validate_operands(a, b)
         return Decimal(pow(float(a), float(b)))
 
-
+@register_operation("root")
 class Root(Operation):
     """
     Root operation implementation.
@@ -247,7 +263,8 @@ class Root(Operation):
         """
         self.validate_operands(a, b)
         return Decimal(pow(float(a), 1 / float(b)))
-    
+
+@register_operation("percent")
 class Percent(Operation):
     """
     Percentage operation implementation.
@@ -286,6 +303,7 @@ class Percent(Operation):
         self.validate_operands(a, b)
         return (a / b) * 100
 
+@register_operation("absolutediff")
 class AbsoluteDiff(Operation):
     """
     Absolute difference operation implementation.
@@ -306,7 +324,8 @@ class AbsoluteDiff(Operation):
         """
         self.validate_operands(a, b)
         return abs(a - b)
-
+    
+@register_operation("intdivide")
 class IntDivide(Operation):
     """
     Interger division operation implementation.
@@ -345,6 +364,7 @@ class IntDivide(Operation):
         self.validate_operands(a, b)
         return a // b
 
+@register_operation("modulo")
 class Modulus(Operation):
     """
     Modulus operation implementation.
@@ -392,19 +412,8 @@ class OperationFactory:
     scalability and decouples the creation logic from the Calculator class.
     """
 
-    # Dictionary mapping operation identifiers to their corresponding classes
-    _operations: Dict[str, type] = {
-        'add': Addition,
-        'subtract': Subtraction,
-        'multiply': Multiplication,
-        'divide': Division,
-        'power': Power,
-        'root': Root,
-        'percent': Percent,
-        'absolutediff': AbsoluteDiff,
-        'intdivide' : IntDivide,
-        'modulo': Modulus
-    }
+    # will fill dictionary with operations via decorator
+    _operations: Dict[str, type] = {}
 
     @classmethod
     def register_operation(cls, name: str, operation_class: type) -> None:
@@ -445,3 +454,14 @@ class OperationFactory:
         if not operation_class:
             raise ValueError(f"Unknown operation: {operation_type}")
         return operation_class()
+    
+    @classmethod
+    def available_operations(cls) -> Dict[str, type]:
+        """
+        Return all registered operations.
+
+        Returns:
+            Dict[str, type]: Mapping of operation names to their classes.
+        """
+        return dict(cls._operations)
+

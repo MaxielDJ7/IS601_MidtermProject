@@ -307,6 +307,44 @@ class AbsoluteDiff(Operation):
         self.validate_operands(a, b)
         return abs(a - b)
 
+class IntDivide(Operation):
+    """
+    Interger division operation implementation.
+
+    Performs the floor division of one number by another.
+    """
+
+    def validate_operands(self, a: Decimal, b: Decimal) -> None:
+        """
+        Validate operands, checking for division by zero.
+
+        Overrides the base class method to ensure that the divisor is not zero.
+
+        Args:
+            a (Decimal): Dividend.
+            b (Decimal): Divisor.
+
+        Raises:
+            ValidationError: If the divisor is zero.
+        """
+        super().validate_operands(a, b)
+        if b == 0:
+            raise ValidationError("Division by zero is not allowed")
+
+    def execute(self, a: Decimal, b: Decimal) -> Decimal:
+        """
+        Divide one number by another.
+
+        Args:
+            a (Decimal): Dividend.
+            b (Decimal): Divisor.
+
+        Returns:
+            Decimal: Quotient of the division.
+        """
+        self.validate_operands(a, b)
+        return a // b
+
 class OperationFactory:
     """
     Factory class for creating operation instances.
@@ -325,7 +363,8 @@ class OperationFactory:
         'power': Power,
         'root': Root,
         'percent': Percent,
-        'absolutediff': AbsoluteDiff
+        'absolutediff': AbsoluteDiff,
+        'intdivide' : IntDivide
     }
 
     @classmethod

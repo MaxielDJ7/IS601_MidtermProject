@@ -200,7 +200,7 @@ class Calculator:
 
             # Create a new Calculation instance with the operation details
             calculation = Calculation(
-                operation=str(self.operation_strategy),
+                operation=self.operation_strategy.__class__.__name__,
                 operand1=validated_a,
                 operand2=validated_b
             )
